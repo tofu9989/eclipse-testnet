@@ -2,6 +2,7 @@
 
 - Visit : [Codespace](https://github.com/codespaces)
 - Enter the below command
+- Choose blank template
 
 ```bash
 wget https://raw.githubusercontent.com/dxzenith/eclipse-testnet/main/eclipse.sh && chmod +x eclipse.sh && ./eclipse.sh
