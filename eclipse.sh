@@ -63,10 +63,13 @@ repeat_count=$(prompt "Enter The Number Of Times To Repeat The Transaction (Reco
 gas_limit="4000000"
 
 for ((i=1; i<=repeat_count; i++)); do
-    execute_and_prompt "Running Bridge Script (Tx $i)..." "node deposit.js $solana_address 0x11b8db6bb77ad8cb9af09d0867bb6b92477dd68e $gas_limit ${ethereum_private_key} https://rpc2.sepolia.org"
+    execute_and_prompt "Running Bridge Script (Tx $i)..." "node deposit.js $solana_address 0x11b8db6bb77ad8cb9af09d0867bb6b92477dd68e $gas_limit ${ethereum_private_key} https://1rpc.io/sepolia"
 done
 
-sleep 10
+echo -e "It will take 2 mins, Don't do anything"
+echo
+
+sleep 120
 
 execute_and_prompt "Checking Solana Balance..." "solana balance"
 
