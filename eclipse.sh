@@ -1,3 +1,6 @@
+RED="\033[0;31m"
+RESET="\033[0;32m"
+
 prompt() {
     read -p "$1" response
     echo $response
@@ -67,10 +70,10 @@ for ((i=1; i<=repeat_count; i++)); do
     echo
 done
 
-echo -e "It will take 2 mins, Don't do anything"
+echo -e "${RED}It will take 4 mins, Don't do anything${RESET}"
 echo
 
-sleep 120
+sleep 240
 
 execute_and_prompt "Creating Token..." "spl-token create-token --enable-metadata -p TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
 
