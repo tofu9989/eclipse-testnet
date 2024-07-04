@@ -64,20 +64,13 @@ gas_limit="4000000"
 
 for ((i=1; i<=repeat_count; i++)); do
     execute_and_prompt "Running Bridge Script (Tx $i)..." "node deposit.js $solana_address 0x11b8db6bb77ad8cb9af09d0867bb6b92477dd68e $gas_limit ${ethereum_private_key} https://1rpc.io/sepolia"
+    echo
 done
 
-echo -e "It will take 1 min, Don't do anything"
+echo -e "It will take 2 mins, Don't do anything"
 echo
 
-sleep 60
-
-execute_and_prompt "Checking Solana Balance..." "solana balance"
-
-balance=$(solana balance | awk '{print $1}')
-if [ "$balance" == "0" ]; then
-    echo "Your Solana Balance Is 0. Please Deposit Funds And Try Again"
-    exit 1
-fi
+sleep 120
 
 execute_and_prompt "Creating Token..." "spl-token create-token --enable-metadata -p TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
 
