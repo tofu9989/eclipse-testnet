@@ -66,6 +66,8 @@ for ((i=1; i<=repeat_count; i++)); do
     execute_and_prompt "Running Bridge Script (Tx $i)..." "node deposit.js $solana_address 0x11b8db6bb77ad8cb9af09d0867bb6b92477dd68e $gas_limit ${ethereum_private_key} https://rpc2.sepolia.org"
 done
 
+sleep 10
+
 execute_and_prompt "Checking Solana Balance..." "solana balance"
 
 balance=$(solana balance | awk '{print $1}')
