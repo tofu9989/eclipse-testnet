@@ -9,7 +9,6 @@ prompt() {
 execute_and_prompt() {
     echo -e "\n$1"
     eval "$2"
-    read -p "Press [Enter] to continue..."
 }
 
 cd $HOME
@@ -28,10 +27,12 @@ else
 fi
 
 execute_and_prompt "Removing Existing Node.js Installation..." "sudo apt-get remove nodejs"
+echo
 
 response=$(prompt "Do you want to proceed with removing Node.js? (Reply 'y' to proceed) ")
 if [ "$response" == "y" ]; then
     sudo apt-get remove nodejs
+    echo
 fi
 
 execute_and_prompt "Installing NVM and Updating Node.js..." 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash && export NVM_DIR="/usr/local/share/nvm"; [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"; [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"; source ~/.bashrc; nvm install --lts; nvm use --lts; node -v'
