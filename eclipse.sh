@@ -66,10 +66,10 @@ for ((i=1; i<=repeat_count; i++)); do
     execute_and_prompt "Running Bridge Script (Tx $i)..." "node deposit.js $solana_address 0x11b8db6bb77ad8cb9af09d0867bb6b92477dd68e $gas_limit ${ethereum_private_key} https://1rpc.io/sepolia"
 done
 
-echo -e "It will take 2 mins, Don't do anything"
+echo -e "It will take 1 min, Don't do anything"
 echo
 
-sleep 120
+sleep 60
 
 execute_and_prompt "Checking Solana Balance..." "solana balance"
 
