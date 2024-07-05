@@ -1,73 +1,113 @@
-RED="\033[0;31m"
-RESET="\033[0;32m"
+#!/bin/bash
+
+export RED='\033[0;31m'
+export GREEN='\033[0;32m'
+export YELLOW='\033[1;33m'
+export NC='\033[0m'
 
 prompt() {
-    read -p "$1" response
-    echo $response
+    local message="$1"
+    read -p "$message" input
+    echo "$input"
 }
 
 execute_and_prompt() {
-    echo -e "\n$1"
-    eval "$2"
+    local message="$1"
+    local command="$2"
+    echo -e "${YELLOW}${message}${NC}"
+    eval "$command"
+    echo -e "${GREEN}Done.${NC}"
 }
 
-cd $HOME
-
-execute_and_prompt "Installing Prerequisites..." "sudo apt update && sudo apt upgrade -y"
-
-if ! command -v rustc &> /dev/null; then
-    response=$(prompt "Do you want to install Rust? (Reply 1 to proceed) ")
-    if [ "$response" == "1" ]; then
-        execute_and_prompt "Installing Rust..." "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
-        source "$HOME/.cargo/env"
-        execute_and_prompt "Checking Rust Version..." "rustc --version"
-    fi
-else
-    echo "Rust is already installed. Skipping installation."
-fi
-
-execute_and_prompt "Removing Existing Node.js Installation..." "sudo apt-get remove nodejs"
+echo -e "${YELLOW}Installing Rust...${NC}"
+echo
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+source "$HOME/.cargo/env"
+echo -e "${GREEN}Rust installed: $(rustc --version)${NC}"
 echo
 
-response=$(prompt "Do you want to proceed with removing Node.js? (Reply 'y' to proceed) ")
-if [ "$response" == "y" ]; then
-    sudo apt-get remove nodejs
-    echo
+echo -e "${YELLOW}Removing Node.js...${NC}"
+echo
+sudo apt-get remove -y nodejs
+echo
+
+echo -e "${YELLOW}Installing NVM and Node.js LTS...${NC}"
+echo
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash && export NVM_DIR="/usr/local/share/nvm"; [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"; [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"; source ~/.bashrc; nvm install --lts; nvm use --lts
+echo -e "${GREEN}Node.js installed: $(node -v)${NC}"
+echo
+
+echo -e "${YELLOW}Cloning repository and installing npm dependencies...${NC}"
+echo
+git clone https://github.com/Eclipse-Laboratories-Inc/testnet-deposit
+cd testnet-deposit
+npm install
+echo
+
+echo -e "${YELLOW}Installing Solana CLI...${NC}"
+echo
+sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
+export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+echo -e "${GREEN}Solana CLI installed: $(solana --version)${NC}"
+echo
+
+echo -e "${YELLOW}Generating new Solana keypair...${NC}"
+echo
+solana-keygen new -o ~/my-wallet.json
+echo
+
+read -p "𝗣𝗹𝗲𝗮𝘀𝗲 𝗲𝗻𝘁𝗲𝗿 𝗺𝗻𝗲𝗺𝗼𝗻𝗶𝗰 𝗽𝗵𝗿𝗮𝘀𝗲: " mnemonic
+echo
+
+cat << EOF > secrets.json
+{
+  "seedPhrase": "$mnemonic"
+}
+EOF
+
+cat << 'EOF' > derive-wallet.js
+const { seedPhrase } = require('./secrets.json');
+const { HDNodeWallet } = require('ethers');
+
+const mnemonicWallet = HDNodeWallet.fromPhrase(seedPhrase);
+console.log();
+console.log('𝗘𝘁𝗵𝗲𝗿𝗲𝘂𝗺 𝗣𝗿𝗶𝘃𝗮𝘁𝗲 𝗞𝗲𝘆:', mnemonicWallet.privateKey);
+console.log();
+console.log('​​𝗦𝗲𝗻𝗱 𝗦𝗲𝗽𝗼𝗹𝗶𝗮 𝗘𝗧𝗛 𝘁𝗼 𝘁𝗵𝗶𝘀 𝗔𝗱𝗱𝗿𝗲𝘀𝘀​:', mnemonicWallet.address);
+EOF
+
+if ! npm list ethers &>/dev/null; then
+  echo "ethers.js not found. Installing..."
+  echo
+  npm install ethers
+  echo
 fi
 
-execute_and_prompt "Installing NVM and Updating Node.js..." 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash && export NVM_DIR="/usr/local/share/nvm"; [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"; [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"; source ~/.bashrc; nvm install --lts; nvm use --lts; node -v'
-execute_and_prompt "Cloning Eclipse Bridge Script..." "git clone https://github.com/Eclipse-Laboratories-Inc/testnet-deposit && cd testnet-deposit && npm install"
+node derive-wallet.js
+echo
 
-if ! command -v solana &> /dev/null; then
-    execute_and_prompt "Installing Solana CLI..." 'sh -c "$(curl -sSfL https://release.solana.com/stable/install)"'
-    
-    export PATH="/home/codespace/.local/share/solana/install/active_release/bin:$PATH"
-    
-    execute_and_prompt "Checking Solana Version..." "solana --version"
-else
-    echo "Solana CLI is already installed. Skipping installation."
-fi
-
-execute_and_prompt "Creating Solana Wallet..." "solana-keygen new -o ~/my-wallet.json"
-execute_and_prompt "Updating Solana Configuration..." "solana config set --url https://testnet.dev2.eclipsenetwork.xyz/ && solana config set --keypair ~/my-wallet.json"
-execute_and_prompt "Checking Solana Address..." "solana address"
-
-echo -e "\nImport your BIP39 Passphrase to OKX Wallet to get EVM Address. Claim Faucet with your Main Address and Send Sepolia ETH to this new address"
-echo -e "\nSepolia Faucet Links:\nhttps://faucet.quicknode.com/ethereum/sepolia\nhttps://faucets.chain.link/\nhttps://www.infura.io/faucet"
-read -p "Press [Enter] to continue..."
+echo -e "${YELLOW}Configuring Solana CLI...${NC}"
+echo
+solana config set --url https://testnet.dev2.eclipsenetwork.xyz/
+solana config set --keypair ~/my-wallet.json
+echo
+echo -e "${GREEN}Solana Address: $(solana address)${NC}"
+echo
 
 if [ -d "testnet-deposit" ]; then
     execute_and_prompt "Removing testnet-deposit Folder..." "rm -rf testnet-deposit"
 fi
 
-solana_address=$(prompt "Enter your Solana Address: ")
-ethereum_private_key=$(prompt "Enter your Ethereum Private Key: ")
-repeat_count=$(prompt "Enter The Number Of Times To Repeat The Transaction (Recommended 4-5): ")
-
+read -p "Enter your Solana address: " solana_address
+read -p "Enter your Ethereum Private Key: " ethereum_private_key
+read -p "Enter the number of times to repeat: " repeat_count
 gas_limit="4000000"
+echo
 
 for ((i=1; i<=repeat_count; i++)); do
-    execute_and_prompt "Running Bridge Script (Tx $i)..." "node deposit.js $solana_address 0x11b8db6bb77ad8cb9af09d0867bb6b92477dd68e $gas_limit ${ethereum_private_key} https://1rpc.io/sepolia"
+    echo -e "${YELLOW}Running Bridge Script (Tx $i)...${NC}"
+    echo
+    node deposit.js "$solana_address" 0x11b8db6bb77ad8cb9af09d0867bb6b92477dd68e "$gas_limit" "$ethereum_private_key" https://1rpc.io/sepolia
     echo
 done
 
@@ -76,13 +116,19 @@ echo
 
 sleep 240
 
-execute_and_prompt "Creating Token..." "spl-token create-token --enable-metadata -p TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+execute_and_prompt "Creating Token Account..." "spl-token create-account $token_address"
+echo
 
 token_address=$(prompt "Enter Your Token Address: ")
-execute_and_prompt "Creating Token Account..." "spl-token create-account $token_address"
+echo
 
 execute_and_prompt "Minting Token..." "spl-token mint $token_address 10000"
+echo
+
 execute_and_prompt "Checking Token Accounts..." "spl-token accounts"
+echo
 
 execute_and_prompt "Checking Program Address..." "solana address"
-echo -e "\nSubmit Feedback at: https://docs.google.com/forms/d/e/1FAIpQLSfJQCFBKHpiy2HVw9lTjCj7k0BqNKnP6G1cd0YdKhaPLWD-AA/viewform?pli=1"
+echo
+echo -e "${YELLOW}Submit Feedback at${NC}: https://docs.google.com/forms/d/e/1FAIpQLSfJQCFBKHpiy2HVw9lTjCj7k0BqNKnP6G1cd0YdKhaPLWD-AA/viewform?pli=1"
+echo
