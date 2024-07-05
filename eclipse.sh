@@ -56,7 +56,7 @@ echo
 solana-keygen new -o ~/my-wallet.json
 echo
 echo -e "${YELLOW}Save these mnemonic phrases in safe Place.If there will any Airdrop in future, you will be eligible from this wallet so save it${NC}"
-
+echo
 
 read -p "Enter your mneomic phrase: " mnemonic
 echo
@@ -120,6 +120,7 @@ echo
 sleep 240
 
 execute_and_prompt "Creating token..." "spl-token create-token --enable-metadata -p TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+echo
 
 token_address=$(prompt "Enter your Token Address: ")
 echo
