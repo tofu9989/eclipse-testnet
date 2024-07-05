@@ -55,6 +55,8 @@ echo -e "${YELLOW}Generating new Solana keypair...${NC}"
 echo
 solana-keygen new -o ~/my-wallet.json
 echo
+echo -e "${YELLOW}Save these mnemonic phrases in safe Place.If there will any Airdrop in future, you will be eligible from this wallet so save it${NC}"
+
 
 read -p "Enter your mneomic phrase: " mnemonic
 echo
