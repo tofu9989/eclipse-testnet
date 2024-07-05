@@ -112,7 +112,7 @@ for ((i=1; i<=repeat_count; i++)); do
     sleep 3
 done
 
-echo -e "${RED}It will take 4 mins, Don't do anything${RESET}"
+echo -e "${RED}It will take 4 mins, Don't do anything, Just Wait${RESET}"
 echo
 
 sleep 240
