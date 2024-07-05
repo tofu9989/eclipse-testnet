@@ -56,7 +56,7 @@ echo
 solana-keygen new -o ~/my-wallet.json
 echo
 
-read -p "𝗣𝗹𝗲𝗮𝘀𝗲 𝗲𝗻𝘁𝗲𝗿 𝗺𝗻𝗲𝗺𝗼𝗻𝗶𝗰 𝗽𝗵𝗿𝗮𝘀𝗲: " mnemonic
+read -p "Enter your mneomic phrase: " mnemonic
 echo
 
 cat << EOF > secrets.json
@@ -71,9 +71,9 @@ const { HDNodeWallet } = require('ethers');
 
 const mnemonicWallet = HDNodeWallet.fromPhrase(seedPhrase);
 console.log();
-console.log('𝗘𝘁𝗵𝗲𝗿𝗲𝘂𝗺 𝗣𝗿𝗶𝘃𝗮𝘁𝗲 𝗞𝗲𝘆:', mnemonicWallet.privateKey);
+console.log('ETHEREUM PRIVATE KEY:', mnemonicWallet.privateKey);
 console.log();
-console.log('​​𝗦𝗲𝗻𝗱 𝗦𝗲𝗽𝗼𝗹𝗶𝗮 𝗘𝗧𝗛 𝘁𝗼 𝘁𝗵𝗶𝘀 𝗔𝗱𝗱𝗿𝗲𝘀𝘀​:', mnemonicWallet.address);
+console.log('​​SEND SEPOLIA ETH TO THIS ADDRESS:', mnemonicWallet.address);
 EOF
 
 if ! npm list ethers &>/dev/null; then
