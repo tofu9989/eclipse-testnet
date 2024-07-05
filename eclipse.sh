@@ -109,6 +109,7 @@ for ((i=1; i<=repeat_count; i++)); do
     echo
     node deposit.js "$solana_address" 0x11b8db6bb77ad8cb9af09d0867bb6b92477dd68e "$gas_limit" "$ethereum_private_key" https://1rpc.io/sepolia
     echo
+    sleep 3
 done
 
 echo -e "${RED}It will take 4 mins, Don't do anything${RESET}"
@@ -116,16 +117,16 @@ echo
 
 sleep 240
 
-execute_and_prompt "Creating Token Account..." "spl-token create-account $token_address"
+execute_and_prompt "Creating token..." "spl-token create-token --enable-metadata -p TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+
+token_address=$(prompt "Enter your Token Address: ")
+echo
+execute_and_prompt "Creating token account..." "spl-token create-account $token_address"
 echo
 
-token_address=$(prompt "Enter Your Token Address: ")
+execute_and_prompt "Minting token..." "spl-token mint $token_address 10000"
 echo
-
-execute_and_prompt "Minting Token..." "spl-token mint $token_address 10000"
-echo
-
-execute_and_prompt "Checking Token Accounts..." "spl-token accounts"
+execute_and_prompt "Checking token accounts..." "spl-token accounts"
 echo
 
 execute_and_prompt "Checking Program Address..." "solana address"
