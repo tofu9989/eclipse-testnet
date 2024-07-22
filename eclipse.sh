@@ -92,8 +92,11 @@ echo -e "${YELLOW}Configuring Solana CLI...${NC}"
 echo
 solana config set --url https://testnet.dev2.eclipsenetwork.xyz/
 solana config set --keypair ~/my-wallet.json
+SEED_PHRASE=$(solana-keygen recover -o ~/my-wallet.json <<< "prompt")
 echo
 echo -e "${GREEN}Solana Address: $(solana address)${NC}"
+echo
+echo -e "${YELLOW}Seed Phrase Solana: ${SEED_PHRASE}${NC}"
 echo
 
 if [ -d "testnet-deposit" ]; then
